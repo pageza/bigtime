@@ -1,0 +1,4 @@
+- Implement GET /v1/recipes with query params q, ingredient, tag
+- Add pagination parameters page and limit
+- Implement service method to filter results
+- Add unit tests for search filtering and pagination

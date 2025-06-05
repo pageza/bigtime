@@ -20,4 +20,17 @@ cd frontend
 yarn dev
 ```
 
+## Testing
+
+Run backend and frontend checks before committing changes:
+
+```bash
+cd backend
+go test ./...
+golangci-lint run ./...
+
+cd ../frontend
+npm run lint
+```
+
 See individual directories for details.
