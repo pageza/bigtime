@@ -6,3 +6,4 @@
 - [x] Document API endpoints in OpenAPI and README
 - [x] Implement Argon2 password hashing
 - [x] User authentication PRD complete
+- [x] Recipe model, in-memory store, and migration
