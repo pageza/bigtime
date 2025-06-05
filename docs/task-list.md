@@ -11,3 +11,6 @@
 
 - [x] GET /v1/recipes search endpoint
 
+- [x] POST /v1/recipes/:id/modify endpoint
+
+All recipe modification tasks are now complete.

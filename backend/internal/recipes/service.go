@@ -3,13 +3,14 @@ package recipes
 import (
 	"context"
 	"errors"
-
 	"strings"
-
+)
 
 // Service provides recipe creation operations.
 type Service struct {
-	Store Store
+	Store    Store
+	ModStore ModStore
+	LLM      LLM
 }
 
 // CreateRequest defines input for creating a recipe.
@@ -23,7 +24,6 @@ type CreateRequest struct {
 
 // ErrInvalidInput is returned when the request is missing required fields.
 var ErrInvalidInput = errors.New("invalid recipe input")
-
 
 // SearchRequest defines filters for querying recipes.
 type SearchRequest struct {
@@ -52,7 +52,6 @@ func (s *Service) Create(ctx context.Context, userID int64, req CreateRequest) (
 	}
 	return r, nil
 }
-
 
 // Search returns recipes matching the request filters.
 func (s *Service) Search(ctx context.Context, req SearchRequest) ([]*Recipe, error) {
@@ -116,3 +115,32 @@ func (s *Service) Search(ctx context.Context, req SearchRequest) ([]*Recipe, err
 	return filtered[start:end], nil
 }
 
+// ErrInvalidPrompt is returned when the prompt is empty.
+var ErrInvalidPrompt = errors.New("invalid modification prompt")
+
+// Modify creates a modified recipe using the LLM and records the modification.
+func (s *Service) Modify(ctx context.Context, userID, recipeID int64, prompt string) (*Recipe, error) {
+	if prompt == "" {
+		return nil, ErrInvalidPrompt
+	}
+	orig, err := s.Store.FindByID(ctx, recipeID)
+	if err != nil {
+		return nil, err
+	}
+	newRec, err := s.LLM.ModifyRecipe(ctx, orig, prompt)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.Store.Create(ctx, newRec); err != nil {
+		return nil, err
+	}
+	if s.ModStore != nil {
+		_ = s.ModStore.Create(ctx, &Modification{
+			SourceRecipeID:   orig.ID,
+			ModifiedRecipeID: newRec.ID,
+			RequestedBy:      userID,
+			Prompt:           prompt,
+		})
+	}
+	return newRec, nil
+}

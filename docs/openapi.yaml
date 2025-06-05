@@ -116,3 +116,29 @@ paths:
             application/json:
               schema:
                 type: object
+
+  /v1/recipes/{id}/modify:
+    post:
+      summary: Request a modified recipe
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompt:
+                  type: string
+      responses:
+        "201":
+          description: created
+          content:
+            application/json:
+              schema:
+                type: object

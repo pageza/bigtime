@@ -31,3 +31,19 @@ curl -X POST -d '{"email":"user@example.com","password":"password"}' \
 curl -X POST -d '{"email":"user@example.com","password":"password"}' \
   http://localhost:8080/v1/tokens
 ```
+
+## Recipe Endpoints
+
+### Create Recipe
+
+```bash
+curl -X POST -d '{"title":"Soup","ingredients":["water"],"steps":["boil"]}' \
+  http://localhost:8080/v1/recipes
+```
+
+### Modify Recipe
+
+```bash
+curl -X POST -d '{"prompt":"spicy"}' \
+  http://localhost:8080/v1/recipes/1/modify
+```

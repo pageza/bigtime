@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"alchemorsel/internal/auth"
 	"alchemorsel/internal/health"
@@ -15,7 +16,8 @@ func main() {
 	store := users.NewMemoryStore()
 	svc := &auth.Service{Store: store, Secret: envOr("JWT_SECRET", "secret")}
 	recipeStore := recipes.NewMemoryStore()
-	recipeSvc := &recipes.Service{Store: recipeStore}
+	modStore := recipes.NewMemoryModStore()
+	recipeSvc := &recipes.Service{Store: recipeStore, ModStore: modStore, LLM: recipes.FakeLLM{}}
 
 	http.HandleFunc("/healthz", health.Handler)
 	http.HandleFunc("/v1/users", auth.RegisterHandler(svc))
@@ -32,6 +34,13 @@ func main() {
 		}
 	})
 
+	http.HandleFunc("/v1/recipes/", func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasSuffix(r.URL.Path, "/modify") && r.Method == http.MethodPost {
+			recipes.ModifyHandler(recipeSvc)(w, r)
+			return
+		}
+		http.NotFound(w, r)
+	})
 
 	server := &http.Server{Addr: ":8080"}
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

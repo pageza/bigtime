@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
@@ -37,7 +38,6 @@ func TestCreateHandler_BadInput(t *testing.T) {
 	}
 }
 
-
 func TestSearchHandler(t *testing.T) {
 	svc := &Service{Store: NewMemoryStore()}
 	if _, err := svc.Create(context.Background(), 1, CreateRequest{Title: "Carrot Soup", Ingredients: []string{"carrot"}, Steps: []string{"mix"}}); err != nil {
@@ -55,3 +55,25 @@ func TestSearchHandler(t *testing.T) {
 	}
 }
 
+func TestModifyHandler(t *testing.T) {
+	svc := &Service{Store: NewMemoryStore(), ModStore: NewMemoryModStore(), LLM: FakeLLM{}}
+	rOrig, _ := svc.Create(context.Background(), 1, CreateRequest{Title: "Stew", Ingredients: []string{"beef"}, Steps: []string{"cook"}})
+	body, _ := json.Marshal(map[string]string{"prompt": "spicy"})
+	req := httptest.NewRequest(http.MethodPost, "/v1/recipes/"+strconv.FormatInt(rOrig.ID, 10)+"/modify", bytes.NewReader(body))
+	w := httptest.NewRecorder()
+	ModifyHandler(svc)(w, req)
+	if w.Code != http.StatusCreated {
+		t.Fatalf("code %d", w.Code)
+	}
+}
+
+func TestModifyHandler_Bad(t *testing.T) {
+	svc := &Service{Store: NewMemoryStore(), ModStore: NewMemoryModStore(), LLM: FakeLLM{}}
+	body, _ := json.Marshal(map[string]string{"prompt": "fail"})
+	req := httptest.NewRequest(http.MethodPost, "/v1/recipes/1/modify", bytes.NewReader(body))
+	w := httptest.NewRecorder()
+	ModifyHandler(svc)(w, req)
+	if w.Code == http.StatusCreated {
+		t.Fatalf("expected error")
+	}
+}
