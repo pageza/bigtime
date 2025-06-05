@@ -37,3 +37,24 @@ func TestMemoryStore_CRUD(t *testing.T) {
 		t.Fatalf("expected not found after delete")
 	}
 }
+
+func TestMemoryStore_List(t *testing.T) {
+	store := NewMemoryStore()
+	ctx := context.Background()
+	for i := 0; i < 3; i++ {
+		r := &Recipe{Title: "T", Ingredients: []string{"i"}, Steps: []string{"s"}, CreatedBy: 1}
+		if err := store.Create(ctx, r); err != nil {
+			t.Fatalf("create: %v", err)
+		}
+	}
+	list, err := store.List(ctx)
+	if err != nil {
+		t.Fatalf("list: %v", err)
+	}
+	if len(list) != 3 {
+		t.Fatalf("expected 3, got %d", len(list))
+	}
+	if list[0].ID > list[1].ID {
+		t.Fatalf("list not sorted")
+	}
+}

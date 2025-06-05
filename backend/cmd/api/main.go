@@ -7,16 +7,29 @@ import (
 
 	"alchemorsel/internal/auth"
 	"alchemorsel/internal/health"
+	"alchemorsel/internal/recipes"
 	"alchemorsel/internal/users"
 )
 
 func main() {
 	store := users.NewMemoryStore()
 	svc := &auth.Service{Store: store, Secret: envOr("JWT_SECRET", "secret")}
+	recipeStore := recipes.NewMemoryStore()
+	recipeSvc := &recipes.Service{Store: recipeStore}
 
 	http.HandleFunc("/healthz", health.Handler)
 	http.HandleFunc("/v1/users", auth.RegisterHandler(svc))
 	http.HandleFunc("/v1/tokens", auth.LoginHandler(svc))
+	http.HandleFunc("/v1/recipes", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			recipes.CreateHandler(recipeSvc)(w, r)
+		case http.MethodGet:
+			recipes.SearchHandler(recipeSvc)(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
 
 	server := &http.Server{Addr: ":8080"}
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {

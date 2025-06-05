@@ -7,3 +7,5 @@
 - [x] Implement Argon2 password hashing
 - [x] User authentication PRD complete
 - [x] Recipe model, in-memory store, and migration
+- [x] POST /v1/recipes endpoint
+- [x] GET /v1/recipes search endpoint
