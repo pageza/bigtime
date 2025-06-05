@@ -25,7 +25,9 @@ func (s *Service) Register(ctx context.Context, email, password string) (*User, 
 	return u, nil
 }
 
-// hashPassword hashes the given password using Argon2.
+// hashPassword hashes the given password using SHA-256 with a random salt.
+// This is a temporary stand-in for Argon2 which requires external
+// dependencies not available in this environment.
 func hashPassword(password string) ([]byte, error) {
 	salt := make([]byte, 16)
 	if _, err := rand.Read(salt); err != nil {

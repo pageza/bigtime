@@ -11,7 +11,8 @@ As a new visitor, I want to create an account and securely log in so that I can 
 ## Requirements
 
 - REST endpoints for user registration and login.
-- Passwords stored using Argon2.
+- Passwords stored using Argon2. (Currently implemented with SHA-256 and a
+  random salt due to offline environment restrictions.)
 - JWT tokens signed with server secret.
 - Duplicate email addresses must be rejected.
 - Errors should be descriptive and actionable.
