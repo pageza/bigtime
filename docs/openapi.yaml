@@ -1,0 +1,47 @@
+openapi: 3.0.0
+info:
+  title: Alchemorsel API
+  version: 1.0.0
+paths:
+  /v1/users:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "201":
+          description: created
+          content:
+            text/plain:
+              schema:
+                type: string
+  /v1/tokens:
+    post:
+      summary: Login and obtain JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: token returned
+          content:
+            text/plain:
+              schema:
+                type: string
