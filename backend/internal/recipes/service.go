@@ -4,13 +4,16 @@ import (
 	"context"
 	"errors"
 	"strings"
+
+	"alchemorsel/internal/profile"
 )
 
 // Service provides recipe creation operations.
 type Service struct {
-	Store    Store
-	ModStore ModStore
-	LLM      LLM
+	Store        Store
+	ModStore     ModStore
+	LLM          LLM
+	ProfileStore profile.Store
 }
 
 // CreateRequest defines input for creating a recipe.
@@ -115,8 +118,48 @@ func (s *Service) Search(ctx context.Context, req SearchRequest) ([]*Recipe, err
 	return filtered[start:end], nil
 }
 
+// PersonalizedSearch filters search results using the user's profile dietary preferences.
+func (s *Service) PersonalizedSearch(ctx context.Context, userID int64, req SearchRequest) ([]*Recipe, error) {
+	results, err := s.Search(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	if s.ProfileStore == nil {
+		return results, nil
+	}
+	p, err := s.ProfileStore.GetByUserID(ctx, userID)
+	if err != nil {
+		if errors.Is(err, profile.ErrNotFound) {
+			return results, nil
+		}
+		return nil, err
+	}
+	var filtered []*Recipe
+	for _, r := range results {
+		skip := false
+		for _, ing := range r.Ingredients {
+			for _, avoid := range p.DietaryPreferences {
+				if strings.EqualFold(ing, avoid) {
+					skip = true
+					break
+				}
+			}
+			if skip {
+				break
+			}
+		}
+		if !skip {
+			filtered = append(filtered, r)
+		}
+	}
+	return filtered, nil
+}
+
 // ErrInvalidPrompt is returned when the prompt is empty.
 var ErrInvalidPrompt = errors.New("invalid modification prompt")
+
+// ErrNotOwner is returned when a user attempts to modify another user's recipe.
+var ErrNotOwner = errors.New("not recipe owner")
 
 // Modify creates a modified recipe using the LLM and records the modification.
 func (s *Service) Modify(ctx context.Context, userID, recipeID int64, prompt string) (*Recipe, error) {
@@ -143,4 +186,39 @@ func (s *Service) Modify(ctx context.Context, userID, recipeID int64, prompt str
 		})
 	}
 	return newRec, nil
+}
+
+// Update modifies an existing recipe owned by the user.
+func (s *Service) Update(ctx context.Context, userID, recipeID int64, req CreateRequest) (*Recipe, error) {
+	if req.Title == "" || len(req.Ingredients) == 0 || len(req.Steps) == 0 {
+		return nil, ErrInvalidInput
+	}
+	r, err := s.Store.FindByID(ctx, recipeID)
+	if err != nil {
+		return nil, err
+	}
+	if r.CreatedBy != userID {
+		return nil, ErrNotOwner
+	}
+	r.Title = req.Title
+	r.Description = req.Description
+	r.Ingredients = append([]string(nil), req.Ingredients...)
+	r.Steps = append([]string(nil), req.Steps...)
+	r.Tags = append([]string(nil), req.Tags...)
+	if err := s.Store.Update(ctx, r); err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
+// Delete removes a recipe owned by the user.
+func (s *Service) Delete(ctx context.Context, userID, recipeID int64) error {
+	r, err := s.Store.FindByID(ctx, recipeID)
+	if err != nil {
+		return err
+	}
+	if r.CreatedBy != userID {
+		return ErrNotOwner
+	}
+	return s.Store.Delete(ctx, recipeID)
 }

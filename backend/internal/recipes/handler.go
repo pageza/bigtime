@@ -43,7 +43,7 @@ func SearchHandler(s *Service) http.HandlerFunc {
 			Page:       page,
 			Limit:      limit,
 		}
-		recipes, err := s.Search(r.Context(), req)
+		recipes, err := s.PersonalizedSearch(r.Context(), 1, req)
 		if err != nil {
 			http.Error(w, "server error", http.StatusInternalServerError)
 			return
@@ -86,5 +86,68 @@ func ModifyHandler(s *Service) http.HandlerFunc {
 		}
 		w.WriteHeader(http.StatusCreated)
 		_ = json.NewEncoder(w).Encode(recipe)
+	}
+}
+
+// UpdateHandler returns an HTTP handler for PUT /v1/recipes/:id.
+func UpdateHandler(s *Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
+		if len(parts) < 3 {
+			http.NotFound(w, r)
+			return
+		}
+		id, err := strconv.ParseInt(parts[2], 10, 64)
+		if err != nil {
+			http.Error(w, "invalid id", http.StatusBadRequest)
+			return
+		}
+		var req CreateRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "invalid json", http.StatusBadRequest)
+			return
+		}
+		recipe, err := s.Update(r.Context(), 1, id, req)
+		if err != nil {
+			switch {
+			case errors.Is(err, ErrNotFound):
+				http.NotFound(w, r)
+			case errors.Is(err, ErrInvalidInput), errors.Is(err, ErrNotOwner):
+				http.Error(w, err.Error(), http.StatusBadRequest)
+			default:
+				http.Error(w, "server error", http.StatusInternalServerError)
+			}
+			return
+		}
+		_ = json.NewEncoder(w).Encode(recipe)
+	}
+}
+
+// DeleteHandler returns an HTTP handler for DELETE /v1/recipes/:id.
+func DeleteHandler(s *Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
+		if len(parts) < 3 {
+			http.NotFound(w, r)
+			return
+		}
+		id, err := strconv.ParseInt(parts[2], 10, 64)
+		if err != nil {
+			http.Error(w, "invalid id", http.StatusBadRequest)
+			return
+		}
+		err = s.Delete(r.Context(), 1, id)
+		if err != nil {
+			switch {
+			case errors.Is(err, ErrNotFound):
+				http.NotFound(w, r)
+			case errors.Is(err, ErrNotOwner):
+				http.Error(w, err.Error(), http.StatusBadRequest)
+			default:
+				http.Error(w, "server error", http.StatusInternalServerError)
+			}
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
 	}
 }

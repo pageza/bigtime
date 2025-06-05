@@ -117,6 +117,57 @@ paths:
               schema:
                 type: object
 
+  /v1/recipes/{id}:
+    put:
+      summary: Update an existing recipe
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                ingredients:
+                  type: array
+                  items:
+                    type: string
+                steps:
+                  type: array
+                  items:
+                    type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: recipe updated
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      summary: Delete an existing recipe
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: recipe deleted
+
   /v1/recipes/{id}/modify:
     post:
       summary: Request a modified recipe

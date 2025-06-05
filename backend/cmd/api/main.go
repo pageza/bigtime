@@ -52,7 +52,14 @@ func main() {
 			recipes.ModifyHandler(recipeSvc)(w, r)
 			return
 		}
-		http.NotFound(w, r)
+		switch r.Method {
+		case http.MethodPut:
+			recipes.UpdateHandler(recipeSvc)(w, r)
+		case http.MethodDelete:
+			recipes.DeleteHandler(recipeSvc)(w, r)
+		default:
+			http.NotFound(w, r)
+		}
 	})
 
 	server := &http.Server{Addr: ":8080"}

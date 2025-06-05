@@ -5,6 +5,8 @@ import (
 	"errors"
 	"strings"
 	"testing"
+
+	"alchemorsel/internal/profile"
 )
 
 func TestService_Create(t *testing.T) {
@@ -77,5 +79,48 @@ func TestService_Modify_Err(t *testing.T) {
 	r, _ := svc.Create(ctx, 1, CreateRequest{Title: "Toast", Ingredients: []string{"bread"}, Steps: []string{"toast"}})
 	if _, err := svc.Modify(ctx, 1, r.ID, "fail"); !errors.Is(err, ErrGenerationFailed) {
 		t.Fatalf("expected generation failure")
+	}
+}
+
+func TestService_Update_Delete(t *testing.T) {
+	store := NewMemoryStore()
+	svc := &Service{Store: store}
+	ctx := context.Background()
+	r, _ := svc.Create(ctx, 1, CreateRequest{Title: "Soup", Ingredients: []string{"carrot"}, Steps: []string{"mix"}})
+
+	updated, err := svc.Update(ctx, 1, r.ID, CreateRequest{Title: "Stew", Ingredients: []string{"carrot"}, Steps: []string{"mix"}})
+	if err != nil || updated.Title != "Stew" {
+		t.Fatalf("update failed: %v", err)
+	}
+	if _, err := svc.Update(ctx, 2, r.ID, CreateRequest{Title: "X", Ingredients: []string{"i"}, Steps: []string{"s"}}); !errors.Is(err, ErrNotOwner) {
+		t.Fatalf("expected not owner")
+	}
+
+	if err := svc.Delete(ctx, 1, r.ID); err != nil {
+		t.Fatalf("delete: %v", err)
+	}
+	if err := svc.Delete(ctx, 1, r.ID); !errors.Is(err, ErrNotFound) {
+		t.Fatalf("expected not found")
+	}
+}
+
+func TestService_PersonalizedSearch(t *testing.T) {
+	store := NewMemoryStore()
+	pstore := profile.NewMemoryStore()
+	svc := &Service{Store: store, ProfileStore: pstore}
+	ctx := context.Background()
+	if _, err := svc.Create(ctx, 1, CreateRequest{Title: "Beef Stew", Ingredients: []string{"beef"}, Steps: []string{"cook"}}); err != nil {
+		t.Fatalf("create beef: %v", err)
+	}
+	if _, err := svc.Create(ctx, 1, CreateRequest{Title: "Carrot Soup", Ingredients: []string{"carrot"}, Steps: []string{"cook"}}); err != nil {
+		t.Fatalf("create carrot: %v", err)
+	}
+	if err := pstore.Create(ctx, &profile.Profile{UserID: 1, DisplayName: "Bob", DietaryPreferences: []string{"beef"}}); err != nil {
+		t.Fatalf("profile create: %v", err)
+	}
+
+	res, err := svc.PersonalizedSearch(ctx, 1, SearchRequest{})
+	if err != nil || len(res) != 1 || !strings.Contains(res[0].Title, "Carrot") {
+		t.Fatalf("unexpected personalized result: %v %v", err, res)
 	}
 }
