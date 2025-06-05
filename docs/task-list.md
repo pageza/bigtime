@@ -13,4 +13,9 @@
 
 - [x] POST /v1/recipes/:id/modify endpoint
 
+- [x] GET /v1/profile endpoint
+- [x] PUT /v1/profile endpoint
+
+User profile tasks implemented.
+
 All recipe modification tasks are now complete.

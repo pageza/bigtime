@@ -142,3 +142,44 @@ paths:
             application/json:
               schema:
                 type: object
+
+  /v1/profile:
+    get:
+      summary: Get the authenticated user's profile
+      responses:
+        "200":
+          description: profile data
+          content:
+            application/json:
+              schema:
+                type: object
+    put:
+      summary: Update the authenticated user's profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+      responses:
+        "200":
+          description: profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    ProfileUpdate:
+      type: object
+      properties:
+        displayName:
+          type: string
+        avatarURL:
+          type: string
+        bio:
+          type: string
+        dietaryPreferences:
+          type: array
+          items:
+            type: string

@@ -47,3 +47,18 @@ curl -X POST -d '{"title":"Soup","ingredients":["water"],"steps":["boil"]}' \
 curl -X POST -d '{"prompt":"spicy"}' \
   http://localhost:8080/v1/recipes/1/modify
 ```
+
+## Profile Endpoints
+
+### Get Profile
+
+```bash
+curl http://localhost:8080/v1/profile
+```
+
+### Update Profile
+
+```bash
+curl -X PUT -d '{"displayName":"Bob"}' \
+  http://localhost:8080/v1/profile
+```

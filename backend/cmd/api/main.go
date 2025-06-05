@@ -8,6 +8,7 @@ import (
 
 	"alchemorsel/internal/auth"
 	"alchemorsel/internal/health"
+	"alchemorsel/internal/profile"
 	"alchemorsel/internal/recipes"
 	"alchemorsel/internal/users"
 )
@@ -18,10 +19,22 @@ func main() {
 	recipeStore := recipes.NewMemoryStore()
 	modStore := recipes.NewMemoryModStore()
 	recipeSvc := &recipes.Service{Store: recipeStore, ModStore: modStore, LLM: recipes.FakeLLM{}}
+	profileStore := profile.NewMemoryStore()
+	profileSvc := &profile.Service{Store: profileStore}
 
 	http.HandleFunc("/healthz", health.Handler)
 	http.HandleFunc("/v1/users", auth.RegisterHandler(svc))
 	http.HandleFunc("/v1/tokens", auth.LoginHandler(svc))
+	http.HandleFunc("/v1/profile", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			profile.GetHandler(profileSvc)(w, r)
+		case http.MethodPut:
+			profile.UpdateHandler(profileSvc)(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
 
 	http.HandleFunc("/v1/recipes", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
