@@ -1,0 +1,5 @@
+- Create User model and memory store
+- Implement registration and login services
+- Add JWT token generation with shared secret
+- Write HTTP handlers for /v1/users and /v1/tokens
+- Add unit tests for service and handlers
