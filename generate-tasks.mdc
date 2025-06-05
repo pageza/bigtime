@@ -1,0 +1,23 @@
+# generate-tasks.mdc
+
+name: Generate Tasks
+description: >
+  Decompose the PRD into atomic, testable, code-ready tasks. Each task must result in a single code
+  artifact (file, function, test, doc, or component). Specify:
+    - Task ID
+    - Description
+    - Deliverable(s) (file, test, doc)
+    - Required input/logic
+    - Dependencies
+    - Acceptance criteria
+
+inputs:
+  - prd_md: Full PRD for a feature
+
+outputs:
+  - task_list: Array of atomic tasks
+
+instructions:
+  - List tasks in logical build order
+  - No ambiguous or multi-step tasks
+  - Reference AGENTS.md coding/workflow rules

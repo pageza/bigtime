@@ -1,0 +1,26 @@
+# make_prd_list.mdc
+
+name: Make PRD List
+description: >
+  From the detailed blueprint, extract every user-facing feature, backend API, and admin/system feature.
+  Generate a master list of PRDs, each with:
+    - File name (e.g., user-auth.md)
+    - Title (concise, human-readable)
+    - Summary (what/why)
+    - Main user story
+    - Key requirements (success criteria, logic, data, error/edge handling)
+    - Dependencies/blockers
+    - Links to relevant blueprint sections
+
+inputs:
+  - blueprint_md_path: Path to main architecture blueprint
+
+outputs:
+  - feature_prd_list: Array of PRD descriptors
+
+instructions:
+  - Read and parse the full blueprint
+  - For every feature (MVP and future), generate a PRD descriptor
+  - Mark features as MVP, Planned, or Optional as appropriate
+  - Cross-reference all user stories and edge cases
+  - Never omit a feature, even if minimal

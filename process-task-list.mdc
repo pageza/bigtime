@@ -1,0 +1,23 @@
+# process-task-list.mdc
+
+name: Process Task List
+description: >
+  For each task in the task list:
+    - Write the code (file/function/component)
+    - Write tests and docs
+    - Run all tests, ensure pass before proceeding
+    - Commit code if version control enabled
+
+inputs:
+  - task_list: Array of tasks (from generate-tasks)
+
+outputs:
+  - codebase: Working repo, with all deliverables and passing tests
+
+instructions:
+  - Follow task order strictly
+  - For each task:
+      1. Write code/doc/test
+      2. Self-check against PRD, run/test
+      3. Do not proceed until passing
+  - After all tasks, produce summary, README, API docs, and report any TODOs/risk areas

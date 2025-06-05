@@ -1,0 +1,23 @@
+# create-prd.mdc
+
+name: Create PRD
+description: >
+  Take a PRD descriptor from the master list. Write a detailed Product Requirements Document for it,
+  including:
+    - Title, summary, user story, all requirements, technical/UX specs, edge cases, non-goals
+    - REST/gRPC API design (if needed)
+    - Data models
+    - Acceptance criteria (how to verify complete)
+    - Links back to blueprint
+
+inputs:
+  - prd_descriptor: PRD descriptor (from make_prd_list)
+  - blueprint_md_path: Blueprint file (for reference)
+
+outputs:
+  - prd_md: Markdown file with full PRD for the feature
+
+instructions:
+  - Use AGENTS.md for coding standards
+  - Add exhaustive logic, edge cases, tests, UX examples as possible
+  - List all input/output params, data models, and state transitions
