@@ -3,8 +3,9 @@ package recipes
 import (
 	"context"
 	"errors"
+
 	"strings"
-)
+
 
 // Service provides recipe creation operations.
 type Service struct {
@@ -22,6 +23,7 @@ type CreateRequest struct {
 
 // ErrInvalidInput is returned when the request is missing required fields.
 var ErrInvalidInput = errors.New("invalid recipe input")
+
 
 // SearchRequest defines filters for querying recipes.
 type SearchRequest struct {
@@ -50,6 +52,7 @@ func (s *Service) Create(ctx context.Context, userID int64, req CreateRequest) (
 	}
 	return r, nil
 }
+
 
 // Search returns recipes matching the request filters.
 func (s *Service) Search(ctx context.Context, req SearchRequest) ([]*Recipe, error) {
@@ -112,3 +115,4 @@ func (s *Service) Search(ctx context.Context, req SearchRequest) ([]*Recipe, err
 	}
 	return filtered[start:end], nil
 }
+

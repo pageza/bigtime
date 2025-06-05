@@ -2,7 +2,9 @@ package recipes
 
 import (
 	"bytes"
+
 	"context"
+
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -35,6 +37,7 @@ func TestCreateHandler_BadInput(t *testing.T) {
 	}
 }
 
+
 func TestSearchHandler(t *testing.T) {
 	svc := &Service{Store: NewMemoryStore()}
 	if _, err := svc.Create(context.Background(), 1, CreateRequest{Title: "Carrot Soup", Ingredients: []string{"carrot"}, Steps: []string{"mix"}}); err != nil {
@@ -51,3 +54,4 @@ func TestSearchHandler(t *testing.T) {
 		t.Fatalf("bad response: %v", err)
 	}
 }
+

@@ -46,6 +46,7 @@ paths:
               schema:
                 type: string
   /v1/recipes:
+
     get:
       summary: Search recipes
       parameters:
@@ -82,6 +83,7 @@ paths:
                 type: array
                 items:
                   type: object
+
     post:
       summary: Create a new recipe
       requestBody:

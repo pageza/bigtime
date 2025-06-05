@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+
 	"strconv"
+
 )
 
 // CreateHandler returns an HTTP handler for POST /v1/recipes.
@@ -29,6 +31,7 @@ func CreateHandler(s *Service) http.HandlerFunc {
 	}
 }
 
+
 // SearchHandler returns an HTTP handler for GET /v1/recipes.
 func SearchHandler(s *Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -50,3 +53,4 @@ func SearchHandler(s *Service) http.HandlerFunc {
 		_ = json.NewEncoder(w).Encode(recipes)
 	}
 }
+
