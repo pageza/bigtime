@@ -1,0 +1,9 @@
+- Set up Vue Router with routes for Home, Search, Recipe Detail, Profile, and Create/Edit.
+- Create Pinia store for user session with login/register actions calling backend auth endpoints.
+- Implement LoginView and RegisterView forms with validation and error handling.
+- Implement ProfileView for viewing and updating the authenticated user's profile via API.
+- Build SearchView with search bar and filters calling GET /v1/recipes, displaying results using RecipeList component.
+- Create RecipeDetailView to show recipe data and allow modifications via POST /v1/recipes/:id/modify.
+- Build RecipeForm component used for recipe creation and editing with optional AI generation prompt.
+- Add unit tests for each view/component using Vue Test Utils.
+- Configure Prettier and update npm lint script to run formatting check.
