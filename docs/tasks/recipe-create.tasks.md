@@ -1,5 +1,5 @@
-- Define Recipe model and migration
-- Implement POST /v1/recipes for manual creation
-- Implement optional AI generation path
-- Implement PUT/DELETE handlers for recipe owner only
-- Write unit tests for handlers and services
+- [x] Define Recipe model and migration
+- [x] Implement POST /v1/recipes for manual creation
+- [x] Implement optional AI generation path
+- [x] Implement PUT/DELETE handlers for recipe owner only
+- [x] Write unit tests for handlers and services

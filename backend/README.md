@@ -41,6 +41,19 @@ curl -X POST -d '{"title":"Soup","ingredients":["water"],"steps":["boil"]}' \
   http://localhost:8080/v1/recipes
 ```
 
+### Update Recipe
+
+```bash
+curl -X PUT -d '{"title":"Better Soup","ingredients":["water"],"steps":["boil"]}' \
+  http://localhost:8080/v1/recipes/1
+```
+
+### Delete Recipe
+
+```bash
+curl -X DELETE http://localhost:8080/v1/recipes/1
+```
+
 ### Modify Recipe
 
 ```bash

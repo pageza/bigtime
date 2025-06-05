@@ -77,3 +77,26 @@ func TestModifyHandler_Bad(t *testing.T) {
 		t.Fatalf("expected error")
 	}
 }
+
+func TestUpdateHandler(t *testing.T) {
+	svc := &Service{Store: NewMemoryStore()}
+	rOrig, _ := svc.Create(context.Background(), 1, CreateRequest{Title: "Stew", Ingredients: []string{"beef"}, Steps: []string{"cook"}})
+	body, _ := json.Marshal(CreateRequest{Title: "Veg Stew", Ingredients: []string{"beef"}, Steps: []string{"cook"}})
+	req := httptest.NewRequest(http.MethodPut, "/v1/recipes/"+strconv.FormatInt(rOrig.ID, 10), bytes.NewReader(body))
+	w := httptest.NewRecorder()
+	UpdateHandler(svc)(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("code %d", w.Code)
+	}
+}
+
+func TestDeleteHandler(t *testing.T) {
+	svc := &Service{Store: NewMemoryStore()}
+	rOrig, _ := svc.Create(context.Background(), 1, CreateRequest{Title: "Stew", Ingredients: []string{"beef"}, Steps: []string{"cook"}})
+	req := httptest.NewRequest(http.MethodDelete, "/v1/recipes/"+strconv.FormatInt(rOrig.ID, 10), nil)
+	w := httptest.NewRecorder()
+	DeleteHandler(svc)(w, req)
+	if w.Code != http.StatusNoContent {
+		t.Fatalf("code %d", w.Code)
+	}
+}
