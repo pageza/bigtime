@@ -46,6 +46,44 @@ paths:
               schema:
                 type: string
   /v1/recipes:
+
+    get:
+      summary: Search recipes
+      parameters:
+        - in: query
+          name: q
+          schema:
+            type: string
+        - in: query
+          name: ingredient
+          schema:
+            type: string
+          explode: true
+          style: form
+        - in: query
+          name: tag
+          schema:
+            type: string
+          explode: true
+          style: form
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: list of recipes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
     post:
       summary: Create a new recipe
       requestBody:

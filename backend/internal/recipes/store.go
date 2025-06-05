@@ -3,6 +3,7 @@ package recipes
 import (
 	"context"
 	"errors"
+	"sort"
 	"sync"
 	"time"
 )
@@ -11,6 +12,8 @@ import (
 type Store interface {
 	Create(ctx context.Context, r *Recipe) error
 	FindByID(ctx context.Context, id int64) (*Recipe, error)
+	// List returns all recipes in undefined order.
+	List(ctx context.Context) ([]*Recipe, error)
 	Update(ctx context.Context, r *Recipe) error
 	Delete(ctx context.Context, id int64) error
 }
@@ -28,6 +31,19 @@ type MemoryStore struct {
 // NewMemoryStore returns an empty MemoryStore.
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{data: make(map[int64]*Recipe)}
+}
+
+// List returns all stored recipes.
+func (m *MemoryStore) List(ctx context.Context) ([]*Recipe, error) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	out := make([]*Recipe, 0, len(m.data))
+	for _, r := range m.data {
+		clone := *r
+		out = append(out, &clone)
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
+	return out, nil
 }
 
 // Create stores a new recipe and assigns an ID.

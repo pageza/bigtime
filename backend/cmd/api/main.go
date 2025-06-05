@@ -20,7 +20,18 @@ func main() {
 	http.HandleFunc("/healthz", health.Handler)
 	http.HandleFunc("/v1/users", auth.RegisterHandler(svc))
 	http.HandleFunc("/v1/tokens", auth.LoginHandler(svc))
-	http.HandleFunc("/v1/recipes", recipes.CreateHandler(recipeSvc))
+
+	http.HandleFunc("/v1/recipes", func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			recipes.CreateHandler(recipeSvc)(w, r)
+		case http.MethodGet:
+			recipes.SearchHandler(recipeSvc)(w, r)
+		default:
+			http.NotFound(w, r)
+		}
+	})
+
 
 	server := &http.Server{Addr: ":8080"}
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
