@@ -1,5 +1,5 @@
-- Define Profile model linked to User
-- Implement GET and PUT /v1/profile
-- Validate display name and avatar URL
+- [x] Define Profile model linked to User
+- [x] Implement GET and PUT /v1/profile
+- [x] Validate display name and avatar URL
 - Update recipe personalization logic using profile
-- Unit tests for profile retrieval and update
+- [x] Unit tests for profile retrieval and update
