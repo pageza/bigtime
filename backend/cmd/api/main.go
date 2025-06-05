@@ -7,7 +7,9 @@ import (
 
 	"alchemorsel/internal/auth"
 	"alchemorsel/internal/health"
+
 	"alchemorsel/internal/users"
+
 )
 
 func main() {
@@ -15,8 +17,12 @@ func main() {
 	svc := &auth.Service{Store: store, Secret: envOr("JWT_SECRET", "secret")}
 
 	http.HandleFunc("/healthz", health.Handler)
-	http.HandleFunc("/v1/users", auth.RegisterHandler(svc))
-	http.HandleFunc("/v1/tokens", auth.LoginHandler(svc))
+
+
+	store := user.NewMemoryStore()
+	svc := &user.Service{Store: store, Secret: []byte("secret")}
+	http.HandleFunc("/v1/users", user.RegisterHandler(svc))
+	http.HandleFunc("/v1/tokens", user.LoginHandler(svc))
 
 	server := &http.Server{Addr: ":8080"}
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
