@@ -5,3 +5,4 @@
 - [x] Registration and login endpoints with tests
 - [x] Document API endpoints in OpenAPI and README
 - [x] Implement Argon2 password hashing
+- [x] User authentication PRD complete
